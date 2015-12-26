@@ -56,12 +56,11 @@ class CentralManagerDelegate: NSObject,CBCentralManagerDelegate {
     
     var peripheralsDiscovered:[CBPeripheral] = []
     
-    var centralManager:CBCentralManager!
     var remoteServiceID:CBUUID!
     var characteristicIDs:[String:CBUUID]! = [:]
     
-    init(centralManager:CBCentralManager,remoteServiceID:CBUUID,characteristicIDs:[String:CBUUID]) {
-        self.centralManager = centralManager
+    init(remoteServiceID:CBUUID,characteristicIDs:[String:CBUUID]) {
+       
         self.remoteServiceID = remoteServiceID
         self.characteristicIDs = characteristicIDs
     }
@@ -71,7 +70,7 @@ class CentralManagerDelegate: NSObject,CBCentralManagerDelegate {
     func centralManagerDidUpdateState(central: CBCentralManager) {
         switch central.state {
         case .PoweredOn:
-            centralManager.scanForPeripheralsWithServices([remoteServiceID], options: nil)
+            central.scanForPeripheralsWithServices([remoteServiceID], options: nil)
             break
         case .PoweredOff:
             break
@@ -97,12 +96,8 @@ class CentralManagerDelegate: NSObject,CBCentralManagerDelegate {
         
     }
     func centralManager(central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: NSError?) {
-        clean()
-    }
-    
-    func clean(){
         peripheralsDiscovered = []
-        centralManager.scanForPeripheralsWithServices([remoteServiceID], options: nil)
+        central.scanForPeripheralsWithServices([remoteServiceID], options: nil)
     }
     
 }
@@ -156,6 +151,9 @@ class CentralController: UIViewController {
     @IBOutlet weak var tb_peripherals: UITableView!
     @IBOutlet weak var btn_back: UIButton!
     
+    var central:CBCentralManager!
+    var remoteServiceID:CBUUID!
+    
     var tableDelegate:TableViewDelegate!
     var tableDataSource:TableViewDataSource!
     var centralManagerDelegate:CentralManagerDelegate!
@@ -175,6 +173,7 @@ class CentralController: UIViewController {
         // Dispose of any resources that can be recreated.
         
         setupView()
+        startingCentralManager()
     }
     
 
@@ -182,6 +181,11 @@ class CentralController: UIViewController {
         btn_back.layer.cornerRadius = 40
     }
     
+    func startingCentralManager(){
+       /* centralManagerDelegate = CentralManagerDelegate(remoteServiceID: <#T##CBUUID#>, characteristicIDs: <#T##[String : CBUUID]#>)
+        
+        central = CBCentralManager(delegate: <#T##CBCentralManagerDelegate?#>, queue: <#T##dispatch_queue_t?#>, options: <#T##[String : AnyObject]?#>)*/
+    }
     
     
     @IBAction func backToSelect(sender: UIButton) {
