@@ -9,6 +9,8 @@
 import UIKit
 import CoreBluetooth
 
+
+
 class TableViewDelegate:NSObject,UITableViewDelegate {
     private var indexOfSelection:Int?
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
@@ -25,13 +27,12 @@ class TableViewDelegate:NSObject,UITableViewDelegate {
 }
 
 class TableViewDataSource: NSObject,UITableViewDataSource {
-    private var tableview:UITableView!
-    private var cellTitles:[String] = []
+    var tableview:UITableView!
+    var cellTitles:[CBPeripheral] = []
     private var cellIndentifier:String!
     
-    init(tableview:UITableView,cellTitles:[String],cellIndentifier:String) {
+    init(tableview:UITableView,cellIndentifier:String) {
         self.tableview = tableview
-        self.cellTitles = cellTitles
         self.cellIndentifier = cellIndentifier
     }
     
@@ -41,7 +42,7 @@ class TableViewDataSource: NSObject,UITableViewDataSource {
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableview.dequeueReusableCellWithIdentifier(cellIndentifier)!
-        cell.textLabel?.text = cellTitles[indexPath.row]
+        cell.textLabel?.text = cellTitles[indexPath.row].name!
         setupCell(cell)
         return cell
     }
@@ -50,19 +51,28 @@ class TableViewDataSource: NSObject,UITableViewDataSource {
         cell.textLabel?.textColor = UIColor.whiteColor()
         cell.textLabel?.textAlignment = .Center
     }
+    
+    
+    
+    
 }
+
 
 class CentralManagerDelegate: NSObject,CBCentralManagerDelegate {
     
     var peripheralsDiscovered:[CBPeripheral] = []
     
     var remoteServiceID:CBUUID!
-    var characteristicIDs:[String:CBUUID]! = [:]
+    var characteristicIDs:[CBUUID]! = []
+    var peripheralDelegate:PeripheralDelegate!
     
-    init(remoteServiceID:CBUUID,characteristicIDs:[String:CBUUID]) {
-       
+    var tableDataSource:TableViewDataSource!
+    
+    init(remoteServiceID:CBUUID,characteristicIDs:[CBUUID],peripheralDelegate:PeripheralDelegate,tableViewDataSource:TableViewDataSource) {
+        self.peripheralDelegate = peripheralDelegate
         self.remoteServiceID = remoteServiceID
         self.characteristicIDs = characteristicIDs
+        self.tableDataSource = tableViewDataSource
     }
     
     
@@ -84,10 +94,14 @@ class CentralManagerDelegate: NSObject,CBCentralManagerDelegate {
     func centralManager(central: CBCentralManager, didDiscoverPeripheral peripheral: CBPeripheral, advertisementData: [String : AnyObject], RSSI: NSNumber) {
         if (peripheralsDiscovered.indexOf(peripheral) == nil) {
             peripheralsDiscovered.append(peripheral)
+            tableDataSource.cellTitles = peripheralsDiscovered
+            tableDataSource.tableview.reloadData()
+            
         }
     }
     
     func centralManager(central: CBCentralManager, didConnectPeripheral peripheral: CBPeripheral) {
+        peripheral.delegate = peripheralDelegate
         peripheral.discoverServices([remoteServiceID])
         central.stopScan()
     }
@@ -105,10 +119,10 @@ class CentralManagerDelegate: NSObject,CBCentralManagerDelegate {
 class PeripheralDelegate:NSObject,CBPeripheralDelegate {
     var remoteService:CBService!
     var remoteServiceID:CBUUID!
-    var characteristicIDs:[String:CBUUID]! = [:]
+    var characteristicIDs:[CBUUID] = []
     var characteristicAvailables:[CBCharacteristic] = []
     
-    init(characteristicIDs:[String:CBUUID],remoteServiceID:CBUUID) {
+    init(characteristicIDs:[CBUUID],remoteServiceID:CBUUID) {
         self.remoteServiceID = remoteServiceID
         self.characteristicIDs = characteristicIDs
     }
@@ -117,7 +131,7 @@ class PeripheralDelegate:NSObject,CBPeripheralDelegate {
         for service in peripheral.services! {
             if service.UUID == remoteServiceID {
                 remoteService = service
-                peripheral.discoverCharacteristics(characteristicIDs.values.reverse(), forService: remoteService)
+                peripheral.discoverCharacteristics(characteristicIDs, forService: remoteService)
             }
         }
     }
@@ -158,7 +172,7 @@ class CentralController: UIViewController {
     var tableDataSource:TableViewDataSource!
     var centralManagerDelegate:CentralManagerDelegate!
     var peripheralDelegate:PeripheralDelegate!
-    var characteristicIDs:[String:CBUUID]! = [:]
+    var characteristicIDs:[CBUUID]! = []
     
     
     
@@ -174,6 +188,7 @@ class CentralController: UIViewController {
         
         setupView()
         startingCentralManager()
+        setupTableView()
     }
     
 
@@ -181,14 +196,22 @@ class CentralController: UIViewController {
         btn_back.layer.cornerRadius = 40
     }
     
-    func startingCentralManager(){
-        remoteServiceID = CBUUID(string: <#T##String#>)
+    func setupTableView(){
+        tableDelegate = TableViewDelegate()
+        tableDataSource = TableViewDataSource(tableview: tb_peripherals, cellIndentifier: "peripheralCell")
         
-        
-    centralManagerDelegate = CentralManagerDelegate(remoteServiceID: <#T##CBUUID#>, characteristicIDs: <#T##[String : CBUUID]#>)
-        
-        central = CBCentralManager(delegate: <#T##CBCentralManagerDelegate?#>, queue: <#T##dispatch_queue_t?#>, options: <#T##[String : AnyObject]?#>)
     }
+    
+    func startingCentralManager(){
+        remoteServiceID = CBUUID(string: REMOTE_SERVICE_UUID)
+         characteristicIDs = [CBUUID(string: VOLUMEN_CHARACTERISTIC_UUID),CBUUID(string: NEXT_CHARACTERISTIC_UUID),CBUUID(string: PLAY_CHARACTERISTIC_UUID),CBUUID(string: PAUSE_CHARACTERISTIC_UUID),CBUUID(string: PAUSE_CHARACTERISTIC_UUID)]
+        
+        peripheralDelegate = PeripheralDelegate(characteristicIDs: characteristicIDs, remoteServiceID: remoteServiceID)
+        centralManagerDelegate = CentralManagerDelegate(remoteServiceID: remoteServiceID, characteristicIDs: characteristicIDs,peripheralDelegate:peripheralDelegate,tableViewDataSource: tableDataSource)
+        central = CBCentralManager(delegate: centralManagerDelegate, queue: nil, options: nil)
+       
+    }
+    
     
     
     @IBAction func backToSelect(sender: UIButton) {
@@ -197,7 +220,13 @@ class CentralController: UIViewController {
     
     
     @IBAction func startToControl(sender: UIButton) {
-        
+        let indexSelected = tableDelegate.getIndexOfCellSelected()
+        if let index = indexSelected{
+            let peripheralsAviables = centralManagerDelegate.peripheralsDiscovered
+            central.connectPeripheral(peripheralsAviables[index], options: nil)
+        }else{
+            
+        }
     }
     
     
