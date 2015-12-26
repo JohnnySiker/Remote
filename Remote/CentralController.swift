@@ -182,9 +182,12 @@ class CentralController: UIViewController {
     }
     
     func startingCentralManager(){
-       /* centralManagerDelegate = CentralManagerDelegate(remoteServiceID: <#T##CBUUID#>, characteristicIDs: <#T##[String : CBUUID]#>)
+        remoteServiceID = CBUUID(string: <#T##String#>)
         
-        central = CBCentralManager(delegate: <#T##CBCentralManagerDelegate?#>, queue: <#T##dispatch_queue_t?#>, options: <#T##[String : AnyObject]?#>)*/
+        
+    centralManagerDelegate = CentralManagerDelegate(remoteServiceID: <#T##CBUUID#>, characteristicIDs: <#T##[String : CBUUID]#>)
+        
+        central = CBCentralManager(delegate: <#T##CBCentralManagerDelegate?#>, queue: <#T##dispatch_queue_t?#>, options: <#T##[String : AnyObject]?#>)
     }
     
     

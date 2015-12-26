@@ -15,6 +15,7 @@
 		9F1F1FE21C2DCF55008C460D /* CentralController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F1F1FE11C2DCF55008C460D /* CentralController.swift */; };
 		9F1F1FE41C2DCF61008C460D /* PeripheralController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F1F1FE31C2DCF61008C460D /* PeripheralController.swift */; };
 		9F1F1FEC1C2DD4F0008C460D /* RemoteUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F1F1FEB1C2DD4F0008C460D /* RemoteUITests.swift */; };
+		9FC1DEC51C2E304700B14FFC /* UUIDS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FC1DEC41C2E304700B14FFC /* UUIDS.swift */; };
 		F2E8E2D997ED6737A805A5CF /* Pods_Remote.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 446BE76014CF3140CABB9E1C /* Pods_Remote.framework */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +45,7 @@
 		9F1F1FE91C2DD4F0008C460D /* RemoteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RemoteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F1F1FEB1C2DD4F0008C460D /* RemoteUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteUITests.swift; sourceTree = "<group>"; };
 		9F1F1FED1C2DD4F0008C460D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9FC1DEC41C2E304700B14FFC /* UUIDS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UUIDS.swift; sourceTree = "<group>"; };
 		9FE4B4521C2DDC5A00B3BE80 /* Remote-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Remote-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -110,6 +112,7 @@
 				9F1F1FD11C2DCC40008C460D /* ViewController.swift */,
 				9F1F1FD31C2DCC40008C460D /* Main.storyboard */,
 				9F1F1FE11C2DCF55008C460D /* CentralController.swift */,
+				9FC1DEC41C2E304700B14FFC /* UUIDS.swift */,
 				9F1F1FE31C2DCF61008C460D /* PeripheralController.swift */,
 				9F1F1FD61C2DCC40008C460D /* Assets.xcassets */,
 				9F1F1FD81C2DCC40008C460D /* LaunchScreen.storyboard */,
@@ -281,6 +284,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9F1F1FD21C2DCC40008C460D /* ViewController.swift in Sources */,
+				9FC1DEC51C2E304700B14FFC /* UUIDS.swift in Sources */,
 				9F1F1FE41C2DCF61008C460D /* PeripheralController.swift in Sources */,
 				9F1F1FE21C2DCF55008C460D /* CentralController.swift in Sources */,
 				9F1F1FD01C2DCC40008C460D /* AppDelegate.swift in Sources */,
