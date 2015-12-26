@@ -9,32 +9,13 @@
 import UIKit
 import BubbleTransition
 
-class BubbleDelegate: NSObject,UIViewControllerTransitioningDelegate {
-    let transition = BubbleTransition()
-    
-    init(animationOrigin:CGPoint,backgrounColor:UIColor) {
-        transition.startingPoint = animationOrigin
-        transition.bubbleColor = backgrounColor
-    }
-    
-    
-    func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        transition.transitionMode = .Present
-        return transition
-    }
-    
-    func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        transition.transitionMode = .Dismiss
-        return transition
-    }
-    
-}
 
-
-class ViewController: UIViewController {
+class ViewController: UIViewController, UIViewControllerTransitioningDelegate {
     
     @IBOutlet weak var btn_Central: UIButton!
     @IBOutlet weak var btn_Peripheral: UIButton!
+    let transition = BubbleTransition()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,11 +44,15 @@ class ViewController: UIViewController {
         
         switch segue.identifier! {
             case "beCentral":
-                controller.transitioningDelegate = BubbleDelegate(animationOrigin: self.view.center, backgrounColor: btn_Central.backgroundColor!)
+                controller.transitioningDelegate = self
+                transition.startingPoint = self.view.center
+                transition.bubbleColor = btn_Central.backgroundColor!
                 controller.modalPresentationStyle = .Custom
             break
             case "bePeripheral":
-                controller.transitioningDelegate = BubbleDelegate(animationOrigin: self.view.center, backgrounColor: btn_Peripheral.backgroundColor!)
+                controller.transitioningDelegate = self
+                transition.startingPoint = self.view.center
+                transition.bubbleColor = btn_Peripheral.backgroundColor!
                 controller.modalPresentationStyle = .Custom
             break
             default:
@@ -77,6 +62,16 @@ class ViewController: UIViewController {
         
     }
 
+    
+    func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        transition.transitionMode = .Present
+        return transition
+    }
+    
+    func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        transition.transitionMode = .Dismiss
+        return transition
+    }
     
     
     
